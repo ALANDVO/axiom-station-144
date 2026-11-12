@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "current_feature": "basic_checker",
+  "features": [
+    {
+      "id": "basic_checker",
+      "title": "Basic username checker CLI",
+      "status": "done",
+      "acceptance": [
+        "CLI command 'sherlock <username>' runs and prints per-site found/not-found",
+        "FastAPI endpoint GET /check?username=<username> returns JSON list of results",
+        "Project includes README with usage instructions and contact info (Alan Vo's website and X profile)"
+      ],
+      "implementation": ["src/sherlock.py"],
+      "tests": ["tests/test_sherlock.py"]
+    },
+    {
+      "id": "site_list_support",
+      "title": "Load site list from JSON configuration",
+      "status": "planned",
+      "acceptance": [
+        "Add sites.json with site definitions (URL template, method, etc.)",
+        "Sherlock reads sites.json at runtime",
+        "Support for both GET and POST sites"
+      ],
+      "implementation": ["sites.json"],
+      "tests": ["tests/test_sites.py"]
+    },
+    {
+      "id": "ssl_option",
+      "title": "Add --ssl/--no-ssl flag to disable certificate verification",
+      "status": "planned",
+      "acceptance": [
+        "CLI supports --ssl and --no-ssl flags",
+        "FastAPI respects ssl_verify flag in request"
+      ],
+      "implementation": ["src/sherlock.py (add ssl flag)"],
+      "tests": ["tests/test_ssl.py"]
+    }
+  ]
+}
