@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build.meta"
+
+[project]
+name = "axiom-station-144"
+version = "0.1.0"
+description = "Hunt down social media accounts by username across social networks"
+authors = [{ name = "Alan Vo", email = "alanvo@gmail.com" }]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "typer",
+    "requests",
+]
