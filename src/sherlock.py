@@ -23,14 +23,20 @@ SITES = [
     {"name": "Reddit", "url": "https://www.reddit.com/user/{}", "method": "GET"},
 ]
 
+
 def check_site(site: Dict[str, Any], username: str, ssl: bool) -> Dict[str, Any]:
     """
     Check a single site for username presence.
     Returns dict with site name, found status, and URL.
+    Uses the site's method field (GET or POST), defaulting to GET.
     """
     url = site["url"].format(username)
+    method = site.get("method", "GET").upper()
     try:
-        response = requests.get(url, verify=ssl, timeout=5)
+        if method == "POST":
+            response = requests.post(url, verify=ssl, timeout=5)
+        else:
+            response = requests.get(url, verify=ssl, timeout=5)
         if response.status_code == 200:
             # simplistic detection: assume found if status 200
             found = True
