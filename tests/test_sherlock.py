@@ -1,5 +1,8 @@
 import pytest
+import warnings
+
 from src.sherlock import check_site, check_sites_concurrent
+
 
 def test_check_site_structure():
     site = {"name": "Test", "url": "https://example.com/{}", "method": "GET"}
@@ -10,6 +13,7 @@ def test_check_site_structure():
     assert isinstance(result["found"], bool)
     assert result["url"] == "https://example.com/testuser"
 
+
 @pytest.mark.asyncio
 async def test_check_sites_concurrent():
     results = await check_sites_concurrent("pytestuser", ssl=False)
@@ -19,6 +23,7 @@ async def test_check_sites_concurrent():
         assert "site" in r
         assert "found" in r
         assert "url" in r
+
 
 def test_check_site_uses_get_method():
     """Test that GET method is used when method field is GET or absent."""
@@ -32,6 +37,7 @@ def test_check_site_uses_get_method():
     result2 = check_site(site_no_method, "testuser", ssl=False)
     assert result2["url"] == "https://example.com/testuser"
 
+
 @pytest.mark.asyncio
 async def test_check_site_uses_post_method():
     """Test that POST method is used when method field is POST."""
@@ -42,3 +48,20 @@ async def test_check_site_uses_post_method():
     result = check_site(site, "testuser", ssl=False)
     assert result["found"] == True  # httpbin.org returns 200 for POST
     assert "post" in result["url"].lower() or "post" in str(result).lower()
+
+
+def test_check_site_suppresses_insecure_request_warning_when_ssl_false():
+    """
+    Test that InsecureRequestWarning is suppressed when ssl=False.
+    This is the new test for the SSL warning suppression fix.
+    """
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        site = {"name": "Test", "url": "https://example.com/{}"}
+        result = check_site(site, "testuser", ssl=False)
+        # Verify result is correct
+        assert result["site"] == "Test"
+        assert result["url"] == "https://example.com/testuser"
+        # Verify no InsecureRequestWarning was emitted
+        insecure_warnings = [x for x in w if issubclass(x.category, requests.packages.urllib3.exceptions.InsecureRequestWarning)]
+        assert len(insecure_warnings) == 0, f"Expected no InsecureRequestWarning, got {len(insecure_warnings)}"

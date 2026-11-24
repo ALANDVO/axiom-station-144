@@ -3,6 +3,8 @@ Core module for checking username existence across sites.
 """
 
 import asyncio
+import warnings
+
 import requests
 from typing import List, Dict, Any
 import typer
@@ -33,6 +35,9 @@ def check_site(site: Dict[str, Any], username: str, ssl: bool) -> Dict[str, Any]
     url = site["url"].format(username)
     method = site.get("method", "GET").upper()
     try:
+        # Suppress InsecureRequestWarning when ssl=False
+        if not ssl:
+            warnings.filterwarnings("ignore", category=requests.packages.urllib3.exceptions.InsecureRequestWarning)
         if method == "POST":
             response = requests.post(url, verify=ssl, timeout=5)
         else:
