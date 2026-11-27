@@ -37,11 +37,12 @@ def check_site(site: Dict[str, Any], username: str, ssl: bool) -> Dict[str, Any]
     try:
         # Suppress InsecureRequestWarning when ssl=False
         if not ssl:
-            warnings.filterwarnings("ignore", category=requests.packages.urllib3.exceptions.InsecureRequestWarning)
-        if method == "POST":
-            response = requests.post(url, verify=ssl, timeout=5)
-        else:
-            response = requests.get(url, verify=ssl, timeout=5)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", category=requests.packages.urllib3.exceptions.InsecureRequestWarning)
+                if method == "POST":
+                    response = requests.post(url, verify=ssl, timeout=5)
+                else:
+                    response = requests.get(url, verify=ssl, timeout=5)
         if response.status_code == 200:
             # simplistic detection: assume found if status 200
             found = True
